@@ -239,6 +239,9 @@ GfxOpenGLS::GfxOpenGLS() {
 }
 
 GfxOpenGLS::~GfxOpenGLS() {
+	for (unsigned int i = 0; i < _numSpecialtyTextures; i++) {
+		destroyTexture(&_specialtyTextures[i]);
+	}
 	delete[] _lights;
 
 	delete _backgroundProgram;
@@ -1215,9 +1218,10 @@ void GfxOpenGLS::selectTexture(const Texture *texture) {
 
 void GfxOpenGLS::destroyTexture(Texture *texture) {
 	GLuint *textures = static_cast<GLuint *>(texture->_texture);
-	glDeleteTextures(1, textures);
-
-	delete[] textures;
+	if (textures) {
+		glDeleteTextures(1, textures);
+		delete[] textures;
+	}
 }
 
 void GfxOpenGLS::createBitmap(BitmapData *bitmap) {

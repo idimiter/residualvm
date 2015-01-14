@@ -119,6 +119,10 @@ GrimEngine::GrimEngine(OSystem *syst, uint32 gameFlags, GrimGameType gameType, C
 		_controlsEnabled[i] = false;
 		_controlsState[i] = false;
 	}
+	_joyAxisPosition = new float[NUM_JOY_AXES];
+	for (int i = 0; i < NUM_JOY_AXES; i++) {
+		_joyAxisPosition[i] = 0;
+	}
 	_speechMode = TextAndVoice;
 	_textSpeed = 7;
 	_mode = _previousMode = NormalMode;
@@ -171,6 +175,7 @@ GrimEngine::GrimEngine(OSystem *syst, uint32 gameFlags, GrimGameType gameType, C
 GrimEngine::~GrimEngine() {
 	delete[] _controlsEnabled;
 	delete[] _controlsState;
+	delete[] _joyAxisPosition;
 
 	clearPools();
 
@@ -798,17 +803,28 @@ void GrimEngine::mainLoop() {
 
 				handleControls(type, event.kbd);
 
-				// Allow lua to react to the event.
-				// Without this lua_update switching the entries in the menu is slow because
-				// if the button is not kept pressed the KEYUP will arrive just after the KEYDOWN
-				// and it will break the lua scripts that checks for the state of the button
-				// with GetControlState()
+				if (getGameType() != GType_MONKEY4) {
+					// Allow lua to react to the event.
+					// Without this lua_update switching the entries in the menu is slow because
+					// if the button is not kept pressed the KEYUP will arrive just after the KEYDOWN
+					// and it will break the lua scripts that checks for the state of the button
+					// with GetControlState()
+					//
+					// This call seems to be only necessary to handle Grim's menu correctly.
+					// In EMI it would have the side-effect that luaUpdate() is sometimes called
+					// in the same millisecond which causes getPerSecond() to return 0 for
+					// any given rate which is not compatible with e.g. actor walking.
 
-				// We do not want the scripts to update while a movie is playing in the PS2-version.
-				if (!(getGamePlatform() == Common::kPlatformPS2 && _mode == SmushMode)) {
-					luaUpdate();
+					// We do not want the scripts to update while a movie is playing in the PS2-version.
+					if (!(getGamePlatform() == Common::kPlatformPS2 && _mode == SmushMode)) {
+						luaUpdate();
+					}
 				}
 			}
+			if (type == Common::EVENT_JOYAXIS_MOTION)
+				handleJoyAxis(event.joystick.axis, event.joystick.position);
+			if (type == Common::EVENT_JOYBUTTON_DOWN || type == Common::EVENT_JOYBUTTON_UP)
+				handleJoyButton(type, event.joystick.button);
 		}
 
 		if (_mode != PauseMode) {
@@ -1243,6 +1259,10 @@ void GrimEngine::setTextSpeed(int speed) {
 }
 
 float GrimEngine::getControlAxis(int num) {
+	int idx = num - KEYCODE_AXIS_JOY1_X;
+	if (idx >= 0 && idx < NUM_JOY_AXES) {
+		return _joyAxisPosition[idx];
+	}
 	return 0;
 }
 

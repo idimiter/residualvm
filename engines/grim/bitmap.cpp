@@ -232,7 +232,10 @@ BitmapData::~BitmapData() {
 }
 
 void BitmapData::freeData() {
-	if (!_keepData) {
+	if (!_keepData && _data) {
+		for (int i = 0; i < _numImages; ++i) {
+			_data[i].free();
+		}
 		delete[] _data;
 		_data = nullptr;
 	}

@@ -20,39 +20,29 @@
  *
  */
 
+#include "common/scummsys.h"
 
-#include "common/system.h"
-#include "video/mpegps_decoder.h"
-#include "engines/grim/movie/mpeg.h"
-#include "engines/grim/grim.h"
+#if defined(SDL_BACKEND)
 
+#include "resvm-sdl-events.h"
 
-#ifdef USE_MPEG2
-
-namespace Grim {
-
-MoviePlayer *CreateMpegPlayer() {
-	return new MpegPlayer();
-}
-
-MpegPlayer::MpegPlayer() : MoviePlayer() {
-	_videoDecoder = new Video::MPEGPSDecoder();
-}
-
-bool MpegPlayer::loadFile(const Common::String &filename) {
-	_fname = Common::String("Video/") + filename + ".pss";
-
-	Common::SeekableReadStream *stream = SearchMan.createReadStreamForMember(_fname);
-	if (!stream)
-		return false;
-
-	_videoDecoder->setDefaultHighColorFormat(Graphics::PixelFormat(4, 8, 8, 8, 0, 8, 16, 24, 0));
-	_videoDecoder->loadStream(stream);
-	_videoDecoder->start();
-
+bool ResVmSdlEventSource::handleJoyButtonDown(SDL_Event &ev, Common::Event &event) {
+	event.type = Common::EVENT_JOYBUTTON_DOWN;
+	event.joystick.button = ev.jbutton.button;
 	return true;
 }
 
-} // end of namespace Grim
+bool ResVmSdlEventSource::handleJoyButtonUp(SDL_Event &ev, Common::Event &event) {
+	event.type = Common::EVENT_JOYBUTTON_UP;
+	event.joystick.button = ev.jbutton.button;
+	return true;
+}
 
-#endif // USE_MPEG2
+bool ResVmSdlEventSource::handleJoyAxisMotion(SDL_Event &ev, Common::Event &event) {
+	event.type = Common::EVENT_JOYAXIS_MOTION;
+	event.joystick.axis = ev.jaxis.axis;
+	event.joystick.position = ev.jaxis.value;
+	return true;
+}
+
+#endif
