@@ -25,31 +25,106 @@
 #include "common/foreach.h"
 #include "common/fs.h"
 #include "common/config-manager.h"
+#include "common/events.h"
+#include "common/system.h"
+
 
 #include "gui/error.h"
-#include "gui/gui-manager.h"
 #include "gui/message.h"
 
+#include "engines/util.h"
 #include "engines/engine.h"
  
 #include "eldorado/eldorado.h"
+
+#include "video/bink_decoder.h"
  
 namespace ElDorado {
  
 ElDoradoEngine::ElDoradoEngine(OSystem *syst) 
  : Engine(syst) {
+
+ 	_system = syst;
+	_video = new Video::BinkDecoder();
+
 	debug("ElDoradoEngine::ElDoradoEngine");
+
+	debug("Path is: %s", ConfMan.get("path").c_str());
 }
  
 ElDoradoEngine::~ElDoradoEngine() {
 	debug("ElDoradoEngine::~ElDoradoEngine");
+
 }
  
 Common::Error ElDoradoEngine::run() { 
 	// Your main even loop should be (invoked from) here.
 	debug("ElDoradoEngine::run: Hello, World!");
 
+	initGraphics(640, 480, true, NULL);
+
+	// Play logos
+	playVideo("gmovies/dwlogo.bik");
+	playVideo("gmovies/revlogo.bik");
+	playVideo("gmovies/ubilogo.bik");
+	playVideo("gmovies/lsplogo.bik");
+
+	playVideo("gmovies/intro.bik");
+	playVideo("gmovies/introend.bik");
+
+	// Main Loop
+	// do {
+	// 	pollKeyboard();
+
+	// 	_system->updateScreen();
+	// 	_system->delayMillis(60);
+	// } while (!shouldQuit());
+
 	return Common::kNoError;
+}
+
+
+void ElDoradoEngine::playVideo(const Common::String &filename) {
+	if (!_video->loadFile(filename)) {
+		warning("Could not play %s", filename.c_str());
+		return;
+	}
+
+	debug("Playing %s ... ", filename.c_str());
+
+	_video->start();
+	while (!shouldQuit() && !_video->endOfVideo()) {
+		pollKeyboard();
+
+		if (_video->needsUpdate()) {
+			const Graphics::Surface *frame = _video->decodeNextFrame();
+
+			if (frame) {
+				_system->copyRectToScreen(frame->getPixels(), frame->pitch, 0, 0, frame->w, frame->h);
+				_system->updateScreen();
+			}
+
+		}
+	}
+	_video->close();
+}
+
+void ElDoradoEngine::pollKeyboard() {
+	Common::Event ev;
+	_eventMan->pollEvent(ev);
+
+	if (ev.type != Common::EVENT_KEYDOWN)
+		return;
+
+	switch (ev.kbd.keycode) {
+		case Common::KEYCODE_ESCAPE:
+			debug("Force stop videos");
+
+			if (_video->isPlaying())
+				_video->close();
+			// quitGame();
+		break;
+	}
 }
  
 } // End of namespace ElDorado

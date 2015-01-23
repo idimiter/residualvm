@@ -25,11 +25,24 @@
 
 #include "engines/engine.h"
 
+
+namespace Video {
+class VideoDecoder;
+}
+
 namespace ElDorado {
 
 class Console;
 
 class ElDoradoEngine : public Engine {
+private:
+	Video::VideoDecoder *_video;
+
+	void playVideo(const Common::String &filename);
+
+protected:
+	void pollKeyboard();
+
 public:
 	ElDoradoEngine(OSystem *syst);
 	~ElDoradoEngine();

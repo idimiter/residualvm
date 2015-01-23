@@ -71,7 +71,7 @@ public:
 			if (!file->isDirectory()) {
 				const char *gameName = file->getName().c_str();
 
-				if (0 == scumm_stricmp("neumevb.oft", gameName)) {
+				if (0 == scumm_stricmp("setup.exe", gameName)) {
 					// You could check the contents of the file now if you need to.
 					detectedGames.push_back(eldorado_setting[0]);
 					break;
