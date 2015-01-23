@@ -34,6 +34,7 @@
 
 #include "engines/grim/debug.h"
 
+#include "engines/grim/movie/codecs/codec48.h"
 #include "engines/grim/movie/codecs/blocky8.h"
 #include "engines/grim/movie/codecs/blocky16.h"
 #include "engines/grim/movie/codecs/smush_decoder.h"
@@ -449,9 +450,11 @@ SmushDecoder::SmushVideoTrack::SmushVideoTrack(int width, int height, int fps, i
 	// Which means 16 bpp, 565, shift of 11, 5, 0, 0 for RGBA
 	_format = Graphics::PixelFormat(2, 5, 6, 5, 0, 11, 5, 0, 0);
 	if (!is16Bit) { // Demo
+		_codec48 = new Codec48Decoder();
 		_blocky8 = new Blocky8();
 		_blocky16 = nullptr;
 	} else {
+		_codec48 = nullptr;
 		_blocky8 = nullptr;
 		_blocky16 = new Blocky16();
 		_blocky16->init(width, height);
@@ -530,7 +533,7 @@ void SmushDecoder::SmushVideoTrack::handleFrameObject(Common::SeekableReadStream
 	assert(!_is16Bit);
 	assert(size >= 14);
 	byte codec = stream->readByte();
-	assert(codec == 47);
+	assert(codec == 47 || codec == 48);
 	/* byte codecParam = */ stream->readByte();
 	_x = stream->readSint16LE();
 	_y = stream->readSint16LE();
@@ -540,6 +543,7 @@ void SmushDecoder::SmushVideoTrack::handleFrameObject(Common::SeekableReadStream
 		_width = width;
 		_height = height;
 		_surface.create(_width, _height, _format);
+		_codec48->init(_width, _height);
 		_blocky8->init(_width, _height);
 	}
 	stream->readUint16LE();
@@ -548,7 +552,12 @@ void SmushDecoder::SmushVideoTrack::handleFrameObject(Common::SeekableReadStream
 	size -= 14;
 	byte *ptr = new byte[size];
 	stream->read(ptr, size);
-	_blocky8->decode((byte *)_surface.getPixels(), ptr);
+
+	if (codec == 47) {
+		_blocky8->decode((byte *)_surface.getPixels(), ptr);
+	} else if (codec == 48) {
+		_codec48->decode((byte *)_surface.getPixels(), ptr);
+	}
 	delete[] ptr;
 }
 

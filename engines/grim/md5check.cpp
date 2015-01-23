@@ -155,6 +155,15 @@ const char *local[] = {
 const char *gfdemo01[] = {
 	"25d831d57a93eb3ab8edbb07b7b63943"
 };
+const char *gdemo001[] = {
+	"aa44d6c01a1b03d4607901933635d385"
+};
+const char *gfdemo01ger[] = {
+	"fd728f040557118b7ca436f8205029e5"
+};
+const char *gfdemo01fra[] = {
+	"fd728f040557118b7ca436f8205029e5" // Same as german
+};
 const char *grimdemo[] = {
 	"3ba28e7e36a49b5fd01ba98e3c772fe8"
 };
@@ -164,7 +173,12 @@ const char *sound001[] = {
 const char *voice001[] = {
 	"f24a45079394fee296a0f7fad07c7fad"
 };
-
+const char *voice001ger[] = {
+	"d1d68735ae10148ecccb6b5000a4db96"
+};
+const char *voice001fra[] = {
+	"43f56fca727e117b724051c740202c26"
+};
 
 // EMI retail PC version
 
@@ -319,6 +333,8 @@ const char *emiPS2_voiceMon[] = {
 
 const char *emid_i9n[] = {
 	"d913504ec3a2fe52ee02a20a154a2b17", // english patched
+	"1cd0547b7cb26082274624b146dab3f1", // french
+	"0e011c72372acc4baeac259b46ae30f4", // german
 };
 const char *emid_lip[] = {
 	"0a145aa7acc1a68a738c7a6f27d23283", // english patched
@@ -354,10 +370,28 @@ void MD5Check::init() {
 
 	if (g_grim->getGameType() == GType_GRIM) {
 		if (g_grim->getGameFlags() & ADGF_DEMO) {
-			MD5SUM("gfdemo01.lab", gfdemo01)
+			bool isDemoWithVideo = false;
+			if (g_grim->getGameLanguage() == Common::DE_DEU) {
+				MD5SUM("gfdemo01.lab", gfdemo01ger)
+				MD5SUM("voice001.lab", voice001ger)
+			} else if (g_grim->getGameLanguage() == Common::FR_FRA) {
+				MD5SUM("gfdemo01.lab", gfdemo01fra)
+				MD5SUM("voice001.lab", voice001fra)
+			} else {
+				// Check which version we have
+				Common::File test;
+				if (!test.open("gfdemo01.lab")) {
+					isDemoWithVideo = true;
+					MD5SUM("gdemo001.lab", gdemo001);
+				} else {
+					MD5SUM("gfdemo01.lab", gfdemo01)
+					MD5SUM("voice001.lab", voice001)
+				}
+			}
+			if (!isDemoWithVideo) {
+				MD5SUM("sound001.lab", sound001)
+			}
 			MD5SUM("grimdemo.mus", grimdemo)
-			MD5SUM("sound001.lab", sound001)
-			MD5SUM("voice001.lab", voice001)
 		} else {
 			MD5SUM("gfupd101.exe", gfupd101)
 			MD5SUM("year4mus.lab", year4mus)

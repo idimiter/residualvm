@@ -1,6 +1,6 @@
-/* ScummVM - Graphic Adventure Engine
+/* ResidualVM - A 3D game interpreter
  *
- * ScummVM is the legal property of its developers, whose names
+ * ResidualVM is the legal property of its developers, whose names
  * are too numerous to list here. Please refer to the COPYRIGHT
  * file distributed with this source distribution.
  *
@@ -20,22 +20,42 @@
  *
  */
 
-#ifndef BACKENDS_GRAPHICS_SAMSUNGTV_H
-#define BACKENDS_GRAPHICS_SAMSUNGTV_H
+#ifndef CODEC48_H
+#define CODEC48_H
 
-#if defined(SAMSUNGTV)
+#include "common/scummsys.h"
 
-#include "backends/graphics/surfacesdl/surfacesdl-graphics.h"
+namespace Grim {
 
-class SamsungTVSdlGraphicsManager : public SurfaceSdlGraphicsManager {
+class Codec48Decoder {
 public:
-	SamsungTVSdlGraphicsManager(SdlEventSource *sdlEventSource);
+	Codec48Decoder();
+	~Codec48Decoder();
+	void init(int width, int height);
+	void deinit();
+	bool decode(byte *dst, const byte *src);
 
-	bool hasFeature(OSystem::Feature f);
-	void setFeatureState(OSystem::Feature f, bool enable);
-	bool getFeatureState(OSystem::Feature f);
+private:
+	void makeTable(int pitch, int index);
+
+	void bompDecodeLine(byte *dst, const byte *src, int len);
+
+	void decode3(byte *dst, const byte *src, int bufOffset);
+	void scaleBlock(byte *dst, const byte *src);
+	void copyBlock(byte *dst, int deltaBufOffset, int offset);
+
+	int _curBuf;
+	byte *_deltaBuf[2];
+	int _blockX, _blockY;
+	int _pitch;
+	int16 *_offsetTable;
+	int _tableLastPitch, _tableLastIndex;
+	int16 _prevSeqNb;
+	int32 _frameSize;
+	int _width, _height;
+	byte *_interTable;
 };
 
-#endif
+} // end of namespace Grim
 
 #endif

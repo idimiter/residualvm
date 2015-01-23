@@ -242,6 +242,52 @@ static const GrimGameDescription gameDescriptions[] = {
 		},
 		GType_GRIM
 	},
+	{
+		// Grim Fandango English demo version (with intro video)
+		{
+			"grim",
+			"Demo",
+			AD_ENTRY1s("gdemo001.lab", "c04c814093be829c4811a3a0aa80833d", 46615911),
+			Common::EN_ANY,
+			Common::kPlatformWindows,
+			ADGF_DEMO,
+			GUIO1(GAMEOPTION_LOAD_DATAUSR)
+		},
+		GType_GRIM
+	},
+	{
+		// Grim Fandango French demo version
+		{
+			"grim",
+			"Demo",
+			{
+				{"gfdemo01.lab", 0, "7df813f3809f2c0234213cfa4f6da062", 29533695},
+				{"voice001.lab", 0, "7df474e03c23692ed02e4ce45f1a6b30", 13764168},
+			},
+			Common::FR_FRA,
+			Common::kPlatformWindows,
+			ADGF_DEMO,
+			GUIO1(GAMEOPTION_LOAD_DATAUSR)
+		},
+		GType_GRIM
+	},
+
+	{
+		// Grim Fandango German demo version
+		{
+			"grim",
+			"Demo",
+			{
+				{"gfdemo01.lab", 0, "7df813f3809f2c0234213cfa4f6da062", 29533695},
+				{"voice001.lab", 0, "2788dc7fd226787f3a68ac9c853d2580", 16561196},
+			},
+			Common::DE_DEU,
+			Common::kPlatformWindows,
+			ADGF_DEMO,
+			GUIO1(GAMEOPTION_LOAD_DATAUSR)
+		},
+		GType_GRIM
+	},
 #ifdef ENABLE_MONKEY4
 	{
 		// Escape from Monkey Island English
@@ -417,12 +463,51 @@ static const GrimGameDescription gameDescriptions[] = {
 		GType_MONKEY4
 	},
 	{
-		// Escape from Monkey Island demo
+		// Escape from Monkey Island demo (English)
 		{
 			"monkey4",
 			"Demo",
-			AD_ENTRY1s("magdemo.lab", "9e7eaa1b9317ff47d5deeda0b2c42ce3", 19826116),
+			{
+				{"magdemo.lab", 0, "9e7eaa1b9317ff47d5deeda0b2c42ce3", 19826116},
+				{"i9n.lab", 0, "274f8579b01e0872fe6f1ba267266149", 26951},
+				AD_LISTEND
+			},
 			Common::EN_ANY,
+			Common::kPlatformWindows,
+			ADGF_DEMO,
+			GUIO1(GAMEOPTION_LOAD_DATAUSR)
+		},
+		GType_MONKEY4
+	},
+	{
+		// Escape from Monkey Island demo (French)
+		{
+			"monkey4",
+			"Demo",
+			{
+				{"magdemo.lab", 0, "9e7eaa1b9317ff47d5deeda0b2c42ce3", 19826116},
+				{"i9n.lab", 0, "7f1744990472261bdcbc02036ba9f7ec", 1718385},
+				AD_LISTEND
+			},
+			Common::FR_FRA,
+			Common::kPlatformWindows,
+			ADGF_DEMO,
+			GUIO1(GAMEOPTION_LOAD_DATAUSR)
+		},
+		GType_MONKEY4
+	},
+
+	{
+		// Escape from Monkey Island demo (German)
+		{
+			"monkey4",
+			"Demo",
+			{
+				{"magdemo.lab", 0, "9e7eaa1b9317ff47d5deeda0b2c42ce3", 19826116},
+				{"i9n.lab", 0, "28f6bc270b5c31970cc110c7656ff598", 1749051},
+				AD_LISTEND
+			},
+			Common::DE_DEU,
 			Common::kPlatformWindows,
 			ADGF_DEMO,
 			GUIO1(GAMEOPTION_LOAD_DATAUSR)
